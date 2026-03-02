@@ -10,7 +10,7 @@ public:
   };
   Tremolo() {
     for (auto& lfo : lfos) {
-      lfo.setFrequency(5.f /* Hz */, true);
+      lfo.setFrequency(440.f /* Hz */, true);
     }
   }
   void prepare(double sampleRate, int expectedMaxFramesPerBlock) {
@@ -22,6 +22,8 @@ public:
     for (auto& lfo : lfos) {
       lfo.prepare(processSpec);
     }
+
+    lfoTransitionSmoother.reset(sampleRate, 0.025f);
 
   }
 
@@ -65,6 +67,9 @@ public:
 private:
   // You should put class members and private functions here
   float getNextLfoValue() {
+    if (lfoTransitionSmoother.isSmoothing()) {
+      return lfoTransitionSmoother.getNextValue();
+    }
     return lfos[juce::toUnderlyingType(currentLfo)].processSample(0.f);
   }
   static float triangle(float phase) {
@@ -74,7 +79,9 @@ private:
 
   void updateLfoWaveform() {
     if (currentLfo != lfoToSet) {
+      lfoTransitionSmoother.setCurrentAndTargetValue(getNextLfoValue());
       currentLfo = lfoToSet;
+      lfoTransitionSmoother.setTargetValue(getNextLfoValue());
     }
   }
 
@@ -84,6 +91,6 @@ private:
   };
   LfoWaveform currentLfo = LfoWaveform::sine;
   LfoWaveform lfoToSet = currentLfo;
-  juce::SmoothedValue<float> gain;
+  juce::SmoothedValue<float> lfoTransitionSmoother{0.f};
 };
 }  // namespace tremolo

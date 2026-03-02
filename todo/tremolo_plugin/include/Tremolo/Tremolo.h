@@ -10,7 +10,7 @@ public:
   };
   Tremolo() {
     for (auto& lfo : lfos) {
-      lfo.setFrequency(440.f /* Hz */, true);
+      lfo.setFrequency(5.f /* Hz */, true);
     }
   }
   void prepare(double sampleRate, int expectedMaxFramesPerBlock) {
@@ -30,6 +30,12 @@ public:
   void setLfoWaveform(LfoWaveform waveform) {
     jassert(waveform == LfoWaveform::sine || waveform == LfoWaveform::triangle);
     lfoToSet = waveform;
+  }
+
+  void setModulationRate(float rateHz) {
+    for (auto& lfo : lfos) {
+      lfo.setFrequency(rateHz);
+    }
   }
 
   void process(juce::AudioBuffer<float>& buffer) noexcept {

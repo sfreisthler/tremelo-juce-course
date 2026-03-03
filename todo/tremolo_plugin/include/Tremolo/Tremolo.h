@@ -1,5 +1,4 @@
 #pragma once
-#include "juce_core/maths/juce_MathsFunctions.h"
 
 namespace tremolo {
 class Tremolo {

@@ -108,6 +108,9 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 
   // apply tremolo
   tremolo.process(buffer);
+
+  float linearGain = juce::Decibels::decibelsToGain(parameters.gain.get());
+  buffer.applyGain(linearGain);
 }
 
 bool PluginProcessor::hasEditor() const {
